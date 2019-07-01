@@ -1,0 +1,22 @@
+{
+  "name": "repack",
+  "version": "1.0.0",
+  "description": "template pack tool",
+  "main": "repack.js",
+  "bin": {
+    "repack": "./bin/repack"
+  },
+  "author": "M",
+  "license": "ISC",
+  "files": [
+    "bin",
+    "repack.js"
+  ],
+  "repository": "https://github.com/noteScript/re-pack",
+  "dependencies": {
+    "colors": "^1.3.3"
+  },
+  "tap": {
+    "check-coverage": true
+  }
+}

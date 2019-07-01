@@ -1,0 +1,141 @@
+#!/usr/bin/env node
+
+const [fs, path, colors, {spawn}] = [
+  require('fs'),
+  require('path'),
+  require('colors/safe'),
+  require('child_process')]
+
+const workDir = process.cwd()
+
+const argv = process.argv
+
+const {
+  output = { // 输出
+    ext: '.yml',
+    dir: 'repack_output',
+  },
+  input = { // 输入
+    ext: '.vue',
+    dir: 'repack_input',
+  },
+  isFlat = true, // 是否递归
+  sep = '.', // 片段分隔符
+  extract, // 需要提取的正则表达式
+  // hasManifest, // 生成清单
+  rewrite, // 重写
+} = require(path.format({
+  root: '/',
+  dir: workDir,
+  name: 'repack.config',
+  ext: '.js',
+}))
+
+function geManifest (trajectory = path.resolve(workDir, input.dir)) { // output
+  return fs.
+  readdirSync(trajectory, {withFileTypes: true}).
+  reduce((manifest, dirent) => {
+    const absolutePath = path.resolve(trajectory, dirent.name)
+    const {
+      root,
+      dir,
+      ...fileInfo
+    } = path.parse(absolutePath)
+    switch (true) {
+      case dirent.isDirectory() : // 向下深度搜索文件
+        return isFlat ? new Map(
+          [...manifest, ...geManifest(absolutePath)],
+        ) : manifest
+      case fileInfo.ext !== input.ext : // 文件类型是否符合
+        return manifest
+      default :
+        fileInfo.content = extract.exec(
+          fs.readFileSync(absolutePath, {encoding: 'utf8'}))
+        manifest.set(dir, (manifest.get(dir) || []).concat(fileInfo))
+        return manifest
+    }
+  }, new Map())
+}
+
+function o (trajectory = path.resolve(workDir, output.dir)) { // output
+  spawn('rm', ['-rf', trajectory]) // fs.rmdirSync(trajectory)
+  const manifest = geManifest()
+  fs.mkdirSync(trajectory, {recursive: true})
+  manifest.forEach((files, dir) => {
+    console.log(colors.blue(`------${dir}:------`))
+    files.forEach(file => {
+      if (file.content) {
+        const [
+          fileName,
+          data,
+        ] = [
+          `${dir.replace(workDir, '').
+          split(path.sep).
+          join(sep).
+          slice(1)}${sep}${file.name}${output.ext}`,
+          typeof rewrite === 'function'
+            ? rewrite(file.content)
+            : file.content[1],
+        ]
+        fs.writeFileSync(path.resolve(trajectory, fileName), data)
+        console.log(colors.grey('completed:'), colors.green(file.base),
+          colors.red('--->'), colors.green(fileName))
+        return
+      }
+      console.log(colors.grey(`meaningless:${file.base}`),
+        colors.gray('[0 byte]'))
+    })
+  })
+
+  console.log(colors.green('------all file processing completed------'))
+
+  process.exit()
+}
+
+function i (trajectory = path.resolve(workDir, output.dir)) { // input
+  fs.readdirSync(trajectory, {withFileTypes: true}).
+  filter(dirent => dirent.isFile() && dirent.ext !== output.ext).
+  reduce((manifest, dirent) => {
+    const {ext, name} = path.parse(dirent.name)
+    const absolutePath = path.resolve(workDir,
+      ...name.replace(ext, '').split(sep)) + input.ext
+    const {
+      root,
+      dir,
+      ...fileInfo
+    } = path.parse(absolutePath)
+    fileInfo.content = fs.readFileSync(path.resolve(trajectory, dirent.name),
+      {encoding: 'utf8'})
+    manifest.set(dir, (manifest.get(dir) || []).concat(fileInfo))
+    return manifest
+  }, new Map()).
+  forEach((files, dir) => {
+    console.log(colors.blue(`------${dir}:------`))
+    files.forEach(file => {
+      if (file.content) {
+        const fileName = path.resolve(dir, file.base)
+        const data = fs.readFileSync(fileName, {encoding: 'utf8'})
+        const replacerStr = extract.exec(data)
+        if (replacerStr) {
+          const content = data.replace(replacerStr && replacerStr[1],
+            file.content)
+          fs.writeFileSync(fileName, content, {flag: 'r+'})
+          console.log(colors.grey('completed:'),
+            colors.green(file.name + output.ext), colors.red('--->'),
+            colors.green(file.base))
+          return
+        }
+        console.log(colors.grey(`meaningless:${file.base}`),
+          colors.gray('[0 byte]'))
+      }
+      console.log(colors.grey(`meaningless:${file.name + output.ext}`),
+        colors.gray('[0 byte]'))
+    })
+  })
+  console.log(colors.green('------all file processing completed------'))
+  process.exit()
+}
+
+if (process.version.replace('v', '').split('.')[0] < 11) throw new Error('node version must >= 11');
+
+module.exports = argv.some(c => c === 'i' || c === 'o') ? eval(`${argv.slice(-1)[0]}()`) : console.log(colors.red('[command]: \n\t-i :file input\n\t-o :file output'))
