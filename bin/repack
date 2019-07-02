@@ -14,7 +14,7 @@ const argv = process.argv
 
 if (!semver.satisfies(process.version, require('../package.json').engines.node)) {
   console.log(colors.red(
-    `You are using Node ${process.version}, but vue-cli-service requires Node ${requiredVersion}.\nPlease upgrade your Node version.`
+    `You are using Node ${process.version}, but reepack requires Node ${requiredVersion}.\nPlease upgrade your Node version.`
   ))
   process.exit(1)
 }
