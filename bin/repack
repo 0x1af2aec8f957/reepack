@@ -1,14 +1,23 @@
 #!/usr/bin/env node
 
-const [fs, path, colors, {spawn}] = [
+const [fs, path, colors, {spawn}, semver] = [
   require('fs'),
   require('path'),
   require('colors/safe'),
-  require('child_process')]
+  require('child_process'),
+  require('semver'),
+  ]
 
 const workDir = process.cwd()
 
 const argv = process.argv
+
+if (!semver.satisfies(process.version, require('../package.json').engines.node)) {
+  console.log(colors.red(
+    `You are using Node ${process.version}, but vue-cli-service requires Node ${requiredVersion}.\nPlease upgrade your Node version.`
+  ))
+  process.exit(1)
+}
 
 const {
   output = { // 输出
@@ -135,7 +144,5 @@ function i (trajectory = path.resolve(workDir, output.dir)) { // input
   console.log(colors.green('------all file processing completed------'))
   process.exit()
 }
-
-if (process.version.replace('v', '').split('.')[0] < 11) throw new Error('node version must >= 11');
 
 module.exports = argv.some(c => c === 'i' || c === 'o') ? eval(`${argv.slice(-1)[0]}()`) : console.log(colors.red('[command]: \n\t-i :file input\n\t-o :file output'))

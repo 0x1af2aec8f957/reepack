@@ -1,6 +1,6 @@
 {
   "name": "repack",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "template pack tool",
   "main": "repack.js",
   "bin": {
@@ -14,7 +14,11 @@
   ],
   "repository": "https://github.com/noteScript/re-pack",
   "dependencies": {
-    "colors": "^1.3.3"
+    "colors": "^1.3.3",
+    "semver": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=10.10.0"
   },
   "tap": {
     "check-coverage": true
