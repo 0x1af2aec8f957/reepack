@@ -1,5 +1,5 @@
 {
-  "name": "repack",
+  "name": "reepack",
   "version": "1.0.1",
   "description": "template pack tool",
   "main": "repack.js",
