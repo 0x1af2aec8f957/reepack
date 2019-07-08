@@ -103,7 +103,7 @@ function o (trajectory = path.resolve(workDir, output.dir)) { // output
 
 function i (trajectory = path.resolve(workDir, output.dir)) { // input
   fs.readdirSync(trajectory, {withFileTypes: true}).
-  filter(dirent => dirent.isFile() && dirent.ext !== output.ext).
+  filter(dirent => dirent.isFile() && path.parse(dirent.name).ext === output.ext).
   reduce((manifest, dirent) => {
     const {ext, name} = path.parse(dirent.name)
     const absolutePath = path.resolve(workDir,

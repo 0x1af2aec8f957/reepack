@@ -2,6 +2,12 @@
 
 ___使用步骤:
 
+##### install repack
+
+```bash
+npm install reepack -D
+```
+
 ##### @workDir/repack.config.js
 
 ```javascript
