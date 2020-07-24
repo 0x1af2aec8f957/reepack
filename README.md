@@ -4,8 +4,14 @@ ___使用步骤:
 
 ##### install repack
 
+###### Environmental.Node
 ```bash
 npm install reepack -D
+```
+
+###### Environmental.Deno
+```bash
+deno install --allow-read --allow-write --allow-run --allow-env repack https://raw.githubusercontent.com/noteScript/reepack/deno/cli.ts
 ```
 
 ##### @workDir/repack.config.js
