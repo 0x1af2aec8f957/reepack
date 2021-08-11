@@ -11,7 +11,7 @@ npm install reepack -D
 
 ###### Environmental.Deno
 ```bash
-deno install --allow-read --allow-write --allow-run --allow-env -n repack https://raw.githubusercontent.com/noteScript/reepack/deno/cli.ts
+deno install --allow-read --allow-write --allow-run --allow-env -n repack https://raw.githubusercontent.com/0x1af2aec8f957/reepack/deno/cli.ts
 ```
 
 ##### @workDir/repack.config.js
