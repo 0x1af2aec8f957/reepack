@@ -1,3 +1,4 @@
+![npm](https://img.shields.io/npm/v/reepack)
 #### 文件内容抽取打包工具
 
 ___使用步骤:
